@@ -1,0 +1,192 @@
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SQLite Web Arayüzü</title>
+	<script src="./external/sql/sql.js"></script>
+	<script src="./external/codemirror/codemirror.js"></script>
+	<link href="./external/codemirror/codemirror.css" rel="stylesheet" />
+	<script src="./external/codemirror/mode/sql/sql.js"></script>
+	<script src="./external/a11y-dialog/a11y-dialog.js"></script>
+	<script src="./arayuz.js"></script>
+	<link href="./arayuz.css" rel="stylesheet" />
+	<script src="https://kit.fontawesome.com/1bdec4fbad.js" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+</head>
+<body>
+	<nav class="menu-intool mt-0">
+		<ul>
+			<li class="sub-menu">
+				<a href="#" >
+					Veritabanı Dosyası
+					<i class="arrow down"></i>
+				</a>
+				<ul style="display: none;">
+					<li>
+						<a id="menu-sqlite-openDB">
+							.db Dosyasını Aç
+						</a>
+					</li>
+					<li>
+						<a id="menu-sqlite-saveDB" >
+							.db Dosyasını Kaydet
+						</a>
+					</li>
+				</ul>
+			</li>
+			<li class="sub-menu">
+				<a href="#">
+					Sorgular
+					<i class="arrow down"></i>
+				</a>
+				<ul style="display: none;">
+					<li>
+						<a id="menu-sqlite-openSQL" >
+							.sql Dosyasını Aç
+						</a>
+					</li>
+					<li>
+						<a id="menu-sqlite-saveSQL" >
+							.sql Dosyasını Kaydet
+						</a>
+					</li>
+				</ul>
+			</li>
+			<li id="menu-view" class="sub-menu" style="display: none;">
+				<a href="#">
+					Görüntüle
+					<i class="arrow down"></i>
+				</a>
+				<ul style="display: none;">
+					<li>
+						<a id="menu-sqlite-browse-view" >
+							Tara
+						</a>
+					</li>
+					<li>
+						<a id="menu-sqlite-structure-view" >
+							Yapı
+						</a>
+					</li>
+				</ul>
+			</li>			
+			<li class="sub-menu">
+				<a class="sub-menu-important" id="ExecuteQuery" alt="Execute query" title="Execute query">
+					SQL Kodunu Çalıştır 
+					<div class="arrow-right"></div>
+				</a>
+			</li>
+		</ul>
+	</nav>
+	<header class="jumbotron jumbotron-fluid mb-0" style="
+			background: rgba(255, 255, 255, 0.39);
+			border-radius: 16px;
+			box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+			backdrop-filter: blur(4px);
+			-webkit-backdrop-filter: blur(4px); height: 240px;">
+		<h1 class="text-black-50 display-5">SQLite Web Arayüzü</h1>
+		<h4 class="text-black-50" style="font-weight: 400">Ahmet Bildirici</h4>
+		<a class="text-decoration-none d-flex justify-content-center" href="http://github.com/ahmetbildirici/" target="_blank"><i class="fa-brands fa-github icons" style="color: #FF8008; font-size: 60px;"></i></a>
+	</header>
+	<div class="arayuz-body">
+		<div class="arayuz-Database border-0">
+			<div class="arayuz-database-title yellow">
+				<h2 class="d-flex justify-content-center">Veritabanı Gezgini</h2>
+			</div>
+			<div class="arayuz-database-container bg-light">
+				<i id="update" class="fa-solid fa-rotate arayuz-browser-update purple" style="font-size: 30px;" title="Güncelle"></i>
+				<span id="table" class="arayuz-browser-structure">Tablolar</span>
+				<div id="table-list" class="list-group" style="display:none;">Tablo yok</div>
+				<div></div>
+				<span id="view" class="arayuz-browser-structure">Görüntüler</span>
+				<div id="view-list" class="list-group" style="display:none;">Görüntü yok</div>
+			</div>
+		</div>
+		<div class="arayuz-container">
+			<input type="file" id="file-input" style="display: none;"  />
+			<input type="file" id="sql-input" style="display: none;"  />
+			<div id="container-row" style="display:none;" class="arayuz-container-center">
+				<div class="arayuz-container-row arayuz-scroll">	
+					<table id="row-results" class="arayuz-results">
+						<thead></thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+			<div id="container-SQL">
+				<div class="arayuz-database-title yellow mt-2">
+					<h2 class="d-flex justify-content-center">SQL Kodları</h2>
+				</div>
+				<div class="arayuz-editor-container mt-0">
+					<textarea id="editor-container" style="display:none;">SELECT name, sql FROM sqlite_master WHERE type='table' ;</textarea>
+				</div>
+				<br/>
+				<div class="arayuz-container-center">
+					<div class="arayuz-container-row arayuz-scroll">
+						<table id="results" class="arayuz-results bg-light">
+							<thead></thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="editor-message-container"><div id="editor-message" style="display:none;"></div></div>
+		</div>
+	</div>
+	<div class="dialog" id="dialog-data">
+	  <div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
+	  <dialog class="dialog-content" role="alertdialog" aria-labelledby="dialogTitle">
+		<button class="dialog-close" data-a11y-dialog-hide aria-label="Close this dialog window">
+		  &times;
+		</button>
+		<div class="title" id="dialog-data-title">Bilgiler</div>
+		<div class="dialog-container dialog-container-data" id="dialog-data-container">
+		</div>
+	  </dialog>
+	</div>
+
+	<div class="dialog" id="dialog-table">
+	  <div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
+	  <dialog class="dialog-content" role="alertdialog" aria-labelledby="dialogTitle">
+		<button class="dialog-close" data-a11y-dialog-hide aria-label="Close this dialog window">
+		  &times;
+		</button>
+		<div class="title"  id="dialog-table-title"><span id="table-name"></span></div>
+		<div class="dialog-container" id="dialog-data-container">		
+			<nav class="menu-intool animated flipInX">
+				<ul>
+					<li class="sub-menu">
+						<a id="menu-sqlite-browse" >
+							Göz At
+						</a>
+					</li>
+					<li class="sub-menu">
+						<a id="menu-sqlite-structure" >
+							Şema
+						</a>
+					</li>
+					<li class="sub-menu">
+						<a id="menu-sqlite-insert" >
+							Satır Ekle
+						</a>
+					</li>
+				</ul>
+			</nav>
+			<div id="container-table"></div>
+		</div>
+	  </dialog>
+	</div>
+
+	<script>
+		sqliteWebJS = null;
+		window.addEventListener("load", function(event) {
+			sqliteWebJS = new SQLiteWebJS();
+			sqliteWebJS.init();
+		});
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
