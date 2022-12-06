@@ -11,4 +11,8 @@ BBY361 dersi kapsamında yaptığım SQL Geliştirici Web Arayüzü (HTML/CSS/Ja
 </p>
 
 ## Import
-  <code>git clone "https://github.com/ahmetbildirici/bby361_sqlite_web_arayuzu"</code>
+  <p>
+  <code>
+    git clone "https://github.com/ahmetbildirici/bby361_sqlite_web_arayuzu"
+  </code>
+  </p>
